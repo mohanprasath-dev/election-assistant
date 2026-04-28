@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 /** Supported UI languages */
 type Language = "en" | "hi" | "ta";
@@ -18,13 +18,35 @@ const LANGUAGES: LanguageOption[] = [
 
 /**
  * Header component with app branding, Indian flag accent,
- * and language selector dropdown.
+ * language selector dropdown, and skip navigation link.
+ *
+ * Accessibility features:
+ * - Skip navigation link for keyboard users
+ * - role="banner" on header
+ * - aria-label on language selector
+ * - Proper heading hierarchy (h1)
  */
 export default function Header() {
   const [language, setLanguage] = useState<Language>("en");
 
+  /** Stable handler for language change */
+  const handleLanguageChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setLanguage(e.target.value as Language);
+    },
+    []
+  );
+
   return (
     <header className="relative w-full" role="banner">
+      {/* Skip navigation link — visible only on focus */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:rounded-md focus:bg-indian-navy focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       {/* Tricolour accent strip */}
       <div className="flex h-1.5 w-full" aria-hidden="true">
         <div className="flex-1 bg-saffron-500" />
@@ -62,9 +84,9 @@ export default function Header() {
           </label>
           <select
             id="language-select"
-            aria-label="Select language"
+            aria-label="Language selector"
             value={language}
-            onChange={(e) => setLanguage(e.target.value as Language)}
+            onChange={handleLanguageChange}
             className="rounded-lg border border-civic-200 bg-white px-3 py-1.5 text-sm font-medium text-civic-800
                        shadow-sm transition-all hover:border-saffron-400 focus:border-saffron-500
                        focus:ring-2 focus:ring-saffron-200"
